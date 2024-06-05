@@ -17,26 +17,28 @@ class WordGamesApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Игры со словами")
-
+        self.root.geometry("800x600")
+        self.root.configure(bg="#f0f0f0")
         self.main_menu()
 
     def main_menu(self):
         self.clear_screen()
 
-        self.label = tk.Label(self.root, text="Выберите игру:")
-        self.label.pack(pady=10)
+        self.label = tk.Label(self.root, text="Выберите игру:", font=("Arial", 24), bg="#f0f0f0")
+        self.label.pack(pady=20)
 
-        self.hangman_button = tk.Button(self.root, text="Виселица", command=self.start_hangman)
-        self.hangman_button.pack(pady=5)
+        self.hangman_button = tk.Button(self.root, text="Виселица", font=("Arial", 18), command=self.start_hangman, bg="#4CAF50", fg="white", width=25)
+        self.hangman_button.pack(pady=10)
 
-        self.words_from_word_button = tk.Button(self.root, text="Слова из слова", command=self.start_words_from_word)
-        self.words_from_word_button.pack(pady=5)
+        self.words_from_word_button = tk.Button(self.root, text="Слова из слова", font=("Arial", 18), command=self.start_words_from_word, bg="#2196F3", fg="white", width=25)
+        self.words_from_word_button.pack(pady=10)
 
-        self.word_on_last_letter_button = tk.Button(self.root, text="Слово на последнюю букву", command=self.start_word_on_last_letter)
-        self.word_on_last_letter_button.pack(pady=5)
+        self.word_on_last_letter_button = tk.Button(self.root, text="Слово на последнюю букву", font=("Arial", 18), command=self.start_word_on_last_letter, bg="#FF5722", fg="white", width=25)
+        self.word_on_last_letter_button.pack(pady=10)
 
     def start_hangman(self):
         self.clear_screen()
+        self.root.geometry("800x1000")
         self.hangman_game = HangmanGame(self.root, self.main_menu)
 
     def start_words_from_word(self):
@@ -65,30 +67,33 @@ class HangmanGame:
         self.update_display()
 
     def create_widgets(self):
-        self.canvas = tk.Canvas(self.root, width=400, height=400)
-        self.canvas.pack()
+        self.canvas = tk.Canvas(self.root, width=400, height=400, bg="#FFFFFF", bd=2, relief="groove")
+        self.canvas.pack(pady=20)
 
-        self.label = tk.Label(self.root, text="Угадайте слово:")
+        self.label = tk.Label(self.root, text="Угадайте слово:", font=("Arial", 18), bg="#f0f0f0")
         self.label.pack()
 
-        self.word_display = tk.Label(self.root, font=('Consolas', 24))
-        self.word_display.pack()
+        self.word_display = tk.Label(self.root, font=('Consolas', 28), bg="#f0f0f0")
+        self.word_display.pack(pady=10)
 
-        self.entry = tk.Entry(self.root)
-        self.entry.pack()
+        self.entry = tk.Entry(self.root, font=("Arial", 18))
+        self.entry.pack(pady=10)
         self.entry.bind('<Return>', self.process_guess)
 
-        self.guess_button = tk.Button(self.root, text="Угадать", command=self.process_guess)
-        self.guess_button.pack()
+        self.guess_button = tk.Button(self.root, text="Угадать", font=("Arial", 18), command=self.process_guess, bg="#9C27B0", fg="white", width=12)
+        self.guess_button.pack(pady=10)
 
-        self.mistakes_label = tk.Label(self.root, text="Ошибки: 0")
-        self.mistakes_label.pack()
+        self.mistakes_label = tk.Label(self.root, text="Ошибки: 0", font=("Arial", 18), bg="#f0f0f0")
+        self.mistakes_label.pack(pady=10)
 
-        self.restart_button = tk.Button(self.root, text="Начать заново", command=self.restart_game)
-        self.restart_button.pack()
+        self.guesses_label = tk.Label(self.root, text="Названные буквы: ", font=("Arial", 18), bg="#f0f0f0")
+        self.guesses_label.pack(pady=10)
 
-        self.back_button = tk.Button(self.root, text="Назад", command=self.back_callback)
-        self.back_button.pack()
+        self.restart_button = tk.Button(self.root, text="Начать заново", font=("Arial", 16), command=self.restart_game, bg="#FFC107", fg="black", width=20)
+        self.restart_button.pack(pady=5)
+
+        self.back_button = tk.Button(self.root, text="Назад", font=("Arial", 16), command=self.back_callback, bg="#607D8B", fg="white", width=20)
+        self.back_button.pack(pady=5)
 
     def update_display(self):
         display_word = " ".join([letter if letter in self.guesses else "_" for letter in self.word])
@@ -96,6 +101,8 @@ class HangmanGame:
 
         self.canvas.delete("all")
         self.draw_hangman()
+
+        self.guesses_label.config(text="Названные буквы: " + ", ".join(sorted(self.guesses)))
 
         if "_" not in display_word:
             messagebox.showinfo("Поздравляем!", "Вы угадали слово!")
@@ -149,6 +156,7 @@ class HangmanGame:
         self.guesses = []
         self.mistakes = 0
         self.mistakes_label.config(text="Ошибки: 0")
+        self.guesses_label.config(text="Названные буквы: ")
         self.update_display()
 
 
@@ -157,6 +165,7 @@ class WordsFromWordGame:
         self.root = root
         self.back_callback = back_callback
 
+        self.word = random.choice(WORDS_FROM_WORD)
         self.words = set(words.words())
         self.used_words = set()
         self.words_found = 0
@@ -164,24 +173,24 @@ class WordsFromWordGame:
         self.create_widgets()
 
     def create_widgets(self):
-        self.label = tk.Label(self.root, text="Составьте слова из слова:")
-        self.label.pack()
+        self.label = tk.Label(self.root, text=f"Составьте слова из слова: {self.word}", font=("Arial", 18), bg="#f0f0f0")
+        self.label.pack(pady=10)
 
-        self.entry = tk.Entry(self.root)
-        self.entry.pack()
+        self.entry = tk.Entry(self.root, font=("Arial", 18))
+        self.entry.pack(pady=10)
         self.entry.bind('<Return>', self.process_word)
 
-        self.submit_button = tk.Button(self.root, text="Отправить", command=self.process_word)
-        self.submit_button.pack()
+        self.submit_button = tk.Button(self.root, text="Отправить", font=("Arial", 18), command=self.process_word, bg="#9C27B0", fg="white", width=12)
+        self.submit_button.pack(pady=10)
 
-        self.words_label = tk.Label(self.root, text="Найденные слова:")
-        self.words_label.pack()
+        self.words_label = tk.Label(self.root, text="Найденные слова:", font=("Arial", 18), bg="#f0f0f0")
+        self.words_label.pack(pady=10)
 
-        self.words_display = tk.Label(self.root, text="", font=('Consolas', 14))
-        self.words_display.pack()
+        self.words_display = tk.Label(self.root, text="", font=('Consolas', 14), bg="#f0f0f0")
+        self.words_display.pack(pady=10)
 
-        self.back_button = tk.Button(self.root, text="Назад", command=self.back_callback)
-        self.back_button.pack()
+        self.back_button = tk.Button(self.root, text="Назад", font=("Arial", 16), command=self.back_callback, bg="#607D8B", fg="white", width=20)
+        self.back_button.pack(pady=10)
 
     def process_word(self, event=None):
         word = self.entry.get().lower()
@@ -223,24 +232,24 @@ class WordOnLastLetterGame:
         self.create_widgets()
 
     def create_widgets(self):
-        self.label = tk.Label(self.root, text=f"Слова на букву '{self.last_letter}':")
-        self.label.pack()
+        self.label = tk.Label(self.root, text=f"Слова на букву '{self.last_letter}':", font=("Arial", 18), bg="#f0f0f0")
+        self.label.pack(pady=10)
 
-        self.entry = tk.Entry(self.root)
-        self.entry.pack()
+        self.entry = tk.Entry(self.root, font=("Arial", 18))
+        self.entry.pack(pady=10)
         self.entry.bind('<Return>', self.process_word)
 
-        self.submit_button = tk.Button(self.root, text="Отправить", command=self.process_word)
-        self.submit_button.pack()
+        self.submit_button = tk.Button(self.root, text="Отправить", font=("Arial", 18), command=self.process_word, bg="#9C27B0", fg="white", width=12)
+        self.submit_button.pack(pady=10)
 
-        self.words_label = tk.Label(self.root, text="Найденные слова:")
-        self.words_label.pack()
+        self.words_label = tk.Label(self.root, text="Найденные слова:", font=("Arial", 18), bg="#f0f0f0")
+        self.words_label.pack(pady=10)
 
-        self.words_display = tk.Label(self.root, text="", font=('Consolas', 14))
-        self.words_display.pack()
+        self.words_display = tk.Label(self.root, text="", font=('Consolas', 14), bg="#f0f0f0")
+        self.words_display.pack(pady=10)
 
-        self.back_button = tk.Button(self.root, text="Назад", command=self.back_callback)
-        self.back_button.pack()
+        self.back_button = tk.Button(self.root, text="Назад", font=("Arial", 16), command=self.back_callback, bg="#607D8B", fg="white", width=20)
+        self.back_button.pack(pady=10)
 
     def process_word(self, event=None):
         word = self.entry.get().lower()
@@ -277,4 +286,3 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = WordGamesApp(root)
     root.mainloop()
-
